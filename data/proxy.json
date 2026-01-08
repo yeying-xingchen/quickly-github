@@ -1,0 +1,9 @@
+{
+    "github_proxy": [
+        {
+            "name": "gh-proxy.com - 香港",
+            "url": "https://gh-proxy.com",
+            "proxy": "https://hk.gh-proxy.org"
+        }
+    ]
+}

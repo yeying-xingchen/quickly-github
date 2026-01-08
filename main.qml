@@ -10,6 +10,11 @@ Window {
     visible: true
     title: qsTr("QuicklyGithub")
     
+    // 存储加速器类型列表
+    property var acceleratorTypes: []
+
+    property var msg: ""
+
     Text {
         anchors.horizontalCenter: parent.horizontalCenter
         text: qsTr("QuicklyGithub")
@@ -23,7 +28,7 @@ Window {
     // 使用 GridLayout 创建更整齐的表单
     GridLayout {
         anchors.centerIn: parent
-        columns: 2
+        columns: 3
         rowSpacing: 10
         columnSpacing: 10
         width: parent.width * 0.8
@@ -39,9 +44,17 @@ Window {
             Layout.fillWidth: true
         }
         
-        // 提交按钮（跨两列）
+        // 添加下拉菜单
+        ComboBox {
+            id: acceleratorType
+            model: acceleratorTypes.length > 0 ? acceleratorTypes : ["获取镜像中..."] // 默认值
+            Layout.fillWidth: true
+            currentIndex: 0
+        }
+        
+        // 提交按钮（跨三列）
         Item {
-            Layout.columnSpan: 2
+            Layout.columnSpan: 3
             Layout.fillWidth: true
             height: 10
         }
@@ -50,26 +63,28 @@ Window {
             highlighted: true
             text: qsTr("开始加速")
             Layout.fillWidth: true
-            Layout.columnSpan: 2
+            Layout.columnSpan: 3
             onClicked: {
-                if (typeof linkHandler !== 'undefined') {
-                    linkHandler.openRepository(linkField.text);
-                } else {
-                    console.log("Opening repository:", linkField.text);
-                }
+                msg = linkHandler.openRepository(linkField.text, acceleratorType.currentText);
+                dialog.open();
             }
         }
 
+        Dialog {
+            id: alert
+            title: qsTr("提示")
+            Text {
+                text: msg
+            }
+            standardButtons: Dialog.Ok
+        }
+
         Button {
-            text: qsTr("开始加速")
+            text: qsTr("获取镜像列表")
             Layout.fillWidth: true
-            Layout.columnSpan: 2
+            Layout.columnSpan: 3
             onClicked: {
-                if (typeof linkHandler !== 'undefined') {
-                    linkHandler.openRepository(linkField.text);
-                } else {
-                    console.log("Opening repository:", linkField.text);
-                }
+                acceleratorTypes = linkHandler.getAcceleratorTypes();
             }
         }
     }

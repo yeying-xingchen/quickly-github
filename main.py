@@ -1,5 +1,6 @@
 import sys
 import webbrowser
+import requests
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QObject, Slot
 
@@ -7,12 +8,29 @@ from RinUI import RinUIWindow
 
 
 class LinkHandler(QObject):
-    @Slot(str)
-    def openRepository(self, url):
+    @Slot(str, str)
+    def openRepository(self, url, accelerator_type):
         """打开仓库链接"""
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
-        webbrowser.open(url)
+        
+        # 根据选择的加速器类型处理链接
+        processed_url = self._apply_accelerator(url, accelerator_type)
+        webbrowser.open(processed_url)
+        return processed_url
+    
+    def _apply_accelerator(self, url, accelerator_type):
+        """应用加速器到 URL"""
+        base_url = accelerator_type
+        return base_url + url
+
+
+    @Slot(result=list)
+    def getAcceleratorTypes(self):
+        """返回加速器类型列表"""
+        resp = requests.get("https://raw.githubusercontent.com/yeying-xingchen/quickly-github/refs/heads/main/data/proxy.json")
+        data = resp.json()
+        return data["github_proxy"]
 
 
 if __name__ == '__main__':
@@ -22,6 +40,5 @@ if __name__ == '__main__':
     # 创建主窗口
     main = RinUIWindow("main.qml")
     # 尝试注册到 QML 上下文
-    if hasattr(main, 'rootContext'):
-        main.rootContext().setContextProperty("linkHandler", link_handler)
+    main.engine.rootContext().setContextProperty("linkHandler", link_handler)
     app.exec()
