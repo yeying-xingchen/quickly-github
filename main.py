@@ -6,6 +6,8 @@ from PySide6.QtCore import QObject, Slot
 
 from RinUI import RinUIWindow
 
+resp = requests.get("https://raw.githubusercontent.com/yeying-xingchen/quickly-github/refs/heads/main/data/proxy.json")
+data = resp.json()
 
 class LinkHandler(QObject):
     @Slot(str, str)
@@ -14,7 +16,10 @@ class LinkHandler(QObject):
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
         
-        # 根据选择的加速器类型处理链接
+        for item in data["github_proxy"]:
+            if item["name"] == accelerator_type:
+                accelerator_type = item["proxy"]
+                break
         processed_url = self._apply_accelerator(url, accelerator_type)
         webbrowser.open(processed_url)
         return processed_url
@@ -28,9 +33,10 @@ class LinkHandler(QObject):
     @Slot(result=list)
     def getAcceleratorTypes(self):
         """返回加速器类型列表"""
-        resp = requests.get("https://raw.githubusercontent.com/yeying-xingchen/quickly-github/refs/heads/main/data/proxy.json")
-        data = resp.json()
-        return data["github_proxy"]
+        for item in data["github_proxy"]:
+            proxy_list = []
+            proxy_list.append(item["name"])
+        return proxy_list
 
 
 if __name__ == '__main__':

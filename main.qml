@@ -68,15 +68,16 @@ Window {
                 msg = linkHandler.openRepository(linkField.text, acceleratorType.currentText);
                 dialog.open();
             }
-        }
 
-        Dialog {
-            id: alert
-            title: qsTr("提示")
-            Text {
-                text: msg
+            Dialog {
+                id: dialog
+                title: qsTr("提示")
+                modal: true
+                Text {
+                    text: qsTr("加速链接为："msg)
+                }
+                standardButtons: Dialog.Ok | Dialog.Cancel
             }
-            standardButtons: Dialog.Ok
         }
 
         Button {
