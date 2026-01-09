@@ -59,7 +59,7 @@ if __name__ == '__main__':
     # 创建链接处理器
     link_handler = LinkHandler()
     # 创建主窗口
-    main = RinUIWindow("main.qml")
+    main = RinUIWindow("pages/main.qml")
     # 尝试注册到 QML 上下文
     main.engine.rootContext().setContextProperty("linkHandler", link_handler)
     app.exec()
