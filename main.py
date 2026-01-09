@@ -46,6 +46,7 @@ class LinkHandler(QObject):
             try:
                 delay = requests.get(item["proxy"], timeout=10).elapsed.total_seconds() # 获取延迟
                 delay = delay*1000 # 转换为毫秒
+                delay = int(delay)
                 name = item["name"]+str(delay)+"ms"
                 proxy_list.append(name)
             except Exception as e:
