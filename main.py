@@ -28,14 +28,28 @@ class LinkHandler(QObject):
         """应用加速器到 URL"""
         base_url = accelerator_type
         return base_url + url
-
+    
 
     @Slot(result=list)
     def getAcceleratorTypes(self):
-        """返回加速器类型列表"""
+        """返回加速器列表"""
+        proxy_list = []
         for item in data["github_proxy"]:
-            proxy_list = []
             proxy_list.append(item["name"])
+        return proxy_list
+
+    @Slot(result=list)
+    def getAcceleratorTypesPing(self):
+        """返回加速器表"""
+        proxy_list = []
+        for item in data["github_proxy"]:
+            try:
+                delay = requests.get(item["proxy"], timeout=10).elapsed.total_seconds() # 获取延迟
+                delay = delay*1000 # 转换为毫秒
+                name = item["name"]+str(delay)+"ms"
+                proxy_list.append(name)
+            except Exception as e:
+                continue
         return proxy_list
 
 

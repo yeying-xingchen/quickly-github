@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import RinUI
 
 Window {
+    id : mainWindow
     width: 640
     height: 480
     visible: true
@@ -12,8 +13,8 @@ Window {
     
     // 存储加速器类型列表
     property var acceleratorTypes: []
-
     property var msg: ""
+    property bool linkHandlerReady: typeof linkHandler !== 'undefined'
 
     Text {
         anchors.horizontalCenter: parent.horizontalCenter
@@ -47,7 +48,9 @@ Window {
         // 添加下拉菜单
         ComboBox {
             id: acceleratorType
-            model: acceleratorTypes.length > 0 ? acceleratorTypes : ["获取镜像中..."] // 默认值
+            model: linkHandlerReady ? 
+                   (acceleratorTypes.length > 0 ? acceleratorTypes : linkHandler.getAcceleratorTypes()) : 
+                   ["等待加载..."]
             Layout.fillWidth: true
             currentIndex: 0
         }
@@ -64,9 +67,15 @@ Window {
             text: qsTr("开始加速")
             Layout.fillWidth: true
             Layout.columnSpan: 3
+            enabled: linkHandlerReady
             onClicked: {
-                msg = linkHandler.openRepository(linkField.text, acceleratorType.currentText);
-                dialog.open();
+                if (linkHandlerReady) {
+                    mainWindow.msg = linkHandler.openRepository(linkField.text, acceleratorType.currentText);
+                    dialog.open();
+                } else {
+                    mainWindow.msg = "链接处理器尚未就绪，请稍后再试";
+                    dialog.open();
+                }
             }
 
             Dialog {
@@ -74,18 +83,23 @@ Window {
                 title: qsTr("提示")
                 modal: true
                 Text {
-                    text: qsTr("加速链接为："msg)
+                    text: qsTr("加速链接已在浏览器中打开。您的加速链接为：\n") + mainWindow.msg
                 }
-                standardButtons: Dialog.Ok | Dialog.Cancel
+                standardButtons: Dialog.Ok
             }
         }
 
         Button {
-            text: qsTr("获取镜像列表")
+            text: qsTr("重新检测镜像延迟")
             Layout.fillWidth: true
             Layout.columnSpan: 3
+            enabled: linkHandlerReady
             onClicked: {
-                acceleratorTypes = linkHandler.getAcceleratorTypes();
+                if (linkHandlerReady) {
+                    acceleratorTypes = linkHandler.getAcceleratorTypesPing();
+                } else {
+                    console.log("linkHandler not ready yet");
+                }
             }
         }
     }
