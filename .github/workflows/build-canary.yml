@@ -51,10 +51,12 @@ jobs:
             --icon "${{ matrix.icon }}" \
             --add-data "RinUI:RinUI" \
             --add-data "assets:assets" \
-            --add-data "main.qml:." \
+            --add-data "pages:pages" \
             --paths=. \
             --contents-directory . \
             --name=QuicklyGithub \
+            --clean \
+            --onedir \
             main.py
 
       - name: 📦 Create archive
