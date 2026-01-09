@@ -1,0 +1,3 @@
+RinUI
+PySide6
+requests

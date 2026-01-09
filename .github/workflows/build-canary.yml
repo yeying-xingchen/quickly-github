@@ -1,0 +1,72 @@
+name: Build Canary
+
+on: [push]
+
+jobs:
+  Windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Build code
+      run: |
+        pip install pyinstaller
+        pyinstaller -F -w main.py -p core.py -p asstes/logo.ico -i asstes/logo.ico --hidden-import core
+    - name: Publish package
+      uses: actions/upload-artifact@v4
+      with:
+        name: Windows-Canary
+        path: D:\a\quickly-github\quickly-github\dist\main.exe
+        if-no-files-found: error
+  Linux: 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Build code
+        run: |
+          pip install pyinstaller
+          pyinstaller -F -w main.py -p core.py -p asstes/logo.png -i asstes/logo.ico --hidden-import core
+      - name: Publish package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Linux-Canary
+          path: /home/runner/work/quickly-github/quickly-github/dist/main
+          if-no-files-found: error
+  MacOS:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Build code
+        run: |
+          pip install pyinstaller
+          pyinstaller -F -w main.py -p core.py -p asstes/logo.png -i asstes/logo.icns --hidden-import core
+      - name: Publish package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacOS-Canary
+          path: /Users/runner/work/quickly-github/quickly-github/dist/main
+          if-no-files-found: error
